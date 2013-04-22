@@ -136,21 +136,27 @@
      */
 
     var EncryptedForm = encrypt.EncryptedForm = function( element, key, options ) {
-        
+
         // element and public key
         this.element = element;
         this.key = key;
-        
+
         // create an empty object if options don't exist
         options = options || {};
-        
+
         this.name = options.name || 'adyen-encrypted-data';
+        this.force = options.force || false;
+        this.id = options.id || this.name;
         this.onsubmit = options.onsubmit || function() {};
 
-        if ( this.element.addEventListener ) {
-            this.element.addEventListener( 'submit', this.handleSubmit.bind( this ), false );
-        } else if ( this.element.attachEvent ) {
-            this.element.attachEvent( 'onsubmit', this.handleSubmit.bind( this ) );
+        if ( this.force !== false ) {
+            this.createEncryptedField( this.encrypt() );
+        } else {
+            if ( this.element.addEventListener ) {
+                this.element.addEventListener( 'submit', this.handleSubmit.bind( this ), false );
+            } else if ( this.element.attachEvent ) {
+                this.element.attachEvent( 'onsubmit', this.handleSubmit.bind( this ) );
+            }
         }
         
     };
@@ -318,7 +324,8 @@
             if ( !element ) {
                 element = document.createElement( 'input' );
                 element.type = 'hidden';
-                element.name = element.id = this.name;
+                element.name = this.name;
+                element.id = this.id;
                 this.element.appendChild( element );
             }
         
